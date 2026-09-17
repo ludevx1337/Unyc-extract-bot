@@ -14,25 +14,26 @@ Dépendances:
 import asyncio
 import os
 import re
-from dataclasses import dataclass,field
-from typing import Optional, List, Dict
+from dataclasses import dataclass, field
+from typing import Optional
 from pandas import DataFrame
 from getpass import getpass
+
 from contextlib import suppress
 
 import pandas as pd
 from playwright.async_api import (
     async_playwright,
     Page,
-    Browser,
+    
     BrowserContext,
     TimeoutError as PlaywrightTimeoutError,
 )
-import os, pathlib
-print("CWD:", pathlib.Path().resolve())
-print(".env exists:", pathlib.Path(".env").exists())
-print("ENV USER set?", bool(os.getenv("UNYC_USERNAME")))
-print("ENV PASS set?", bool(os.getenv("UNYC_PASSWORD")))
+
+
+
+
+
 
 # =========================
 # Configuration & Helpers
@@ -51,7 +52,7 @@ class Settings:
 
 
 
-from getpass import getpass
+
 
 class UnycAutomation:
     def __init__(self):
@@ -61,7 +62,7 @@ class UnycAutomation:
             self.settings.username = input("UNYC username: ").strip()
         if not self.settings.password:
             self.settings.password = getpass("UNYC password: ")
-        self.processed_clients: List[Dict] = []
+        self.processed_clients: list[dict] = []
         self.excel_df: Optional[DataFrame] = None
 
 
@@ -77,7 +78,7 @@ class UnycAutomation:
     # =========================
     # Excel
     # =========================
-    def read_clients_from_excel(self) -> List[str]:
+    def read_clients_from_excel(self) -> list[str]:
         """Charge l'Excel, prépare colonnes et normalisation, retourne la liste unique de clients."""
         try:
             if not os.path.exists(self.settings.excel_file):
@@ -120,7 +121,7 @@ class UnycAutomation:
                 "Excel non chargé. Appelle d'abord read_clients_from_excel() et vérifie qu'il a réussi."
             )
         return self.excel_df
-    def get_phone_numbers_for_client(self, client_name: str) -> List[str]:
+    def get_phone_numbers_for_client(self, client_name: str) -> list[str]:
         """Retourne les numéros (tels qu'en Excel) pour un client donné."""
         try:
             df = self._df()  
@@ -542,7 +543,7 @@ class UnycAutomation:
         parts = [re.escape(d) for d in digits]
         return re.compile(r"\s*".join(parts))
 
-    async def _wait_any_selector(self, page: Page, selectors: List[str], timeout: int = 15000):
+    async def _wait_any_selector(self, page: Page, selectors: list[str], timeout: int = 15000):
         """Attend qu'au moins un des selecteurs existe (et ne soit pas display:none)."""
         js = """
         sels => {
@@ -556,14 +557,14 @@ class UnycAutomation:
         }
         """
         return await page.wait_for_function(js, arg=selectors, timeout=timeout)
-    async def extract_rio_for_phone_number(self, page: Page, client_name: str, phone_info: Dict):
+    async def extract_rio_for_phone_number(self, page: Page, client_name: str, phone_info: dict):
         """Ouvre la sous-ligne, va sur l'onglet Contrat, lit le RIO et l'enregistre."""
         target_number = phone_info.get("number", "Unknown")
         found_number = phone_info.get("found_number", target_number)
         user_id = phone_info.get("user_id", "")
         row = phone_info.get("row")
 
-        async def wait_any(selectors: List[str], timeout: int = 15000):
+        async def wait_any(selectors: list[str], timeout: int = 15000):
             js = """
             sels => {
             for (const sel of sels) {
@@ -657,7 +658,7 @@ class UnycAutomation:
 
     async def open_mobile_and_get_rio(self, page: Page, user_id: str, targetPhone: Optional[str] = None) -> Optional[str]:
         """Ouvre 'Lignes mobiles' -> clique la ligne (par numéro si dispo) -> Onglet Contrat -> lit le RIO."""
-        async def wait_any(selectors: List[str], timeout: int = 15000):
+        async def wait_any(selectors: list[str], timeout: int = 15000):
             js = """
             sels => {
             for (const sel of sels) {
@@ -824,7 +825,7 @@ class UnycAutomation:
 
     # Orchestration
     # =========================
-    async def process_all_clients(self, page: Page, clients: List[str]):
+    async def process_all_clients(self, page: Page, clients: list[str]):
         total = len(clients)
         print(f"\n🚀 Lancement: {total} client(s)")
         for i, client in enumerate(clients, 1):

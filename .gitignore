@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Secrets / sessions
+.env
+.env.*
+!.env.example
+unyc_state.json
+*.storage.json
+
+# Local Excel data / exports
+*.xlsx
+*.xls
+*.csv
+!example.xlsx
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs / temporary files
+*.log
+*.tmp
